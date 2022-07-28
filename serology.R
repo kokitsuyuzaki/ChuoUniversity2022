@@ -12,6 +12,9 @@ library("ggplot2")
 library("reshape2")
 library("RColorBrewer")
 
+# Setting
+options(repr.plot.width=6, repr.plot.height=12)
+
 # Function Definition
 load_serology <- function(){
 	# Download from Zenodo Server
@@ -45,15 +48,21 @@ load_serology <- function(){
         arr[,,k] <- arr[,,k] - mean(arr[,,k])
     }
     # Array -> Tensor
-    as.tensor(arr)
+    covid19 <- as.tensor(arr)
+    # Group Label
+    group <- cbind(rownames(data)[1:438], data$group[1:438])
+    colnames(group) <- c("Sample", "Group")
+    # Output
+    list(covid19=covid19, group=group)
 }
 
-# Tensor Data
-covid19 <- load_serology()
+# Serology Data
+serology_data <- load_serology()
+covid19 <- serology_data$covid19
+group <- serology_data$group
 
 # Tucker Decomposition
 J = 2
-set.seed(123456)
 res_tucker <- hosvd(covid19, ranks=rep(J, length=3))
 
 # Receptor Patterns
@@ -83,12 +92,12 @@ colnames(df_a) <- c("Antigen", "Component", "Value")
 df_a$Antigen <- factor(df_a$Antigen, level=rev(unique(df_a$Antigen)))
 
 ## Plot Antigen Patterns
-g_r <- ggplot(df_a, aes(x=Component, y=Antigen, fill = Value))
-g_r <- g_r + geom_tile()
-g_r <- g_r +  scale_fill_gradientn("value", colours = brewer.pal(11, "PiYG"))
-g_r <- g_r + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-g_r <- g_r + theme(text = element_text(size=30))
-g_r
+g_a <- ggplot(df_a, aes(x=Component, y=Antigen, fill = Value))
+g_a <- g_a + geom_tile()
+g_a <- g_a +  scale_fill_gradientn("value", colours = brewer.pal(11, "PiYG"))
+g_a <- g_a + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+g_a <- g_a + theme(text = element_text(size=30))
+g_a
 
 # Sample Patterns
 ## Preprocessing
@@ -96,14 +105,18 @@ pattern_s <- res_tucker$U[[3]]
 rownames(pattern_s) <- dimnames(covid19@data)$samples
 colnames(pattern_s) <- paste("Component", seq(J))
 df_s <- melt(pattern_s)
-colnames(df_s) <- c("Sample", "Component", "Value")
+df_s <- merge(df_s, group, by.x="Var1", by.y="Sample")
+colnames(df_s) <- c("Sample", "Component", "Value", "Group")
 df_s$Sample <- factor(df_s$Sample, level=rev(unique(df_s$Sample)))
+df_s$Group <- factor(df_s$Group, level=c("Negative", "Mild", "Moderate", "Severe", "Deceased"))
 
 ## Plot Sample Patterns
 g_s <- ggplot(df_s, aes(x=Component, y=Sample, fill = Value))
 g_s <- g_s + geom_tile()
+g_s <- g_s + facet_wrap(~Group, ncol=2)
 g_s <- g_s +  scale_fill_gradientn("value", colours = brewer.pal(11, "PiYG"))
-g_s <- g_s + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+g_s <- g_s + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+g_s <- g_s + theme(axis.title.x = element_blank())
 g_s <- g_s + theme(axis.text.y = element_blank())
 g_s <- g_s + theme(text = element_text(size=30))
 g_s
