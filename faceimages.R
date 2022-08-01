@@ -22,7 +22,7 @@ plot_coef <- function(coef_matrix, colvec){
     for(i in seq(10)){
         tmp <- as.matrix(coef_matrix[,i])
         dim(tmp) <- c(92, 112)
-        image(tmp, col=colvec, main=i)
+        image(tmp, col=rev(colvec), main=i)
     }
 }
 
