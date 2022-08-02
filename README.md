@@ -6,5 +6,10 @@
 
 [ハンズオン1: 顔画像解析](https://colab.research.google.com/github/kokitsuyuzaki/ChuoUniversity2022/blob/master/faceimages.ipynb)
 
-[ハンズオン2: 血清学データ解析](https://colab.research.google.com/github/kokitsuyuzaki/ChuoUniversity2022/blob/master/serology.ipynb)
+[ハンズオン2: NMFのダイバージェンスの違い](https://colab.research.google.com/github/kokitsuyuzaki/ChuoUniversity2022/blob/master/demo_nmf.ipynb)
+
+[ハンズオン3: アリの巣解析](https://colab.research.google.com/github/kokitsuyuzaki/ChuoUniversity2022/blob/master/formicidae.ipynb)
+
+[ハンズオン4: 血清学データ解析](https://colab.research.google.com/github/kokitsuyuzaki/ChuoUniversity2022/blob/master/serology.ipynb)
+
 
